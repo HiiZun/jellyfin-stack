@@ -14,7 +14,7 @@ jobs:
 
         services:
             docker:
-                image: docker:19.03.12
+                image: "docker:19.03.12"
                 options: --privileged
                 ports:
                     - 8096:8096
@@ -29,64 +29,64 @@ jobs:
 
         steps:
             - name: Checkout code
-                uses: actions/checkout@v2
+              uses: actions/checkout@v2
 
             - name: Set up Docker Buildx
-                uses: docker/setup-buildx-action@v1
+              uses: docker/setup-buildx-action@v1
 
             - name: Cache Docker layers
-                uses: actions/cache@v2
-                with:
+              uses: actions/cache@v2
+              with:
                     path: /tmp/.buildx-cache
                     key: ${{ runner.os }}-buildx-${{ github.sha }}
                     restore-keys: |
                         ${{ runner.os }}-buildx-
 
             - name: Set up QEMU
-                uses: docker/setup-qemu-action@v1
+              uses: docker/setup-qemu-action@v1
 
             - name: Login to DockerHub
-                uses: docker/login-action@v1
-                with:
+              uses: docker/login-action@v1
+              with:
                     username: ${{ secrets.DOCKER_USERNAME }}
                     password: ${{ secrets.DOCKER_PASSWORD }}
 
             - name: Build and push
-                uses: docker/build-push-action@v2
-                with:
+              uses: docker/build-push-action@v2
+              with:
                     context: .
                     push: false
-                    tags: user/app:latest
+                    tags: "user/app:latest"
 
             - name: Run Docker Compose
-                run: docker-compose -f compose.yml up -d
+              run: docker-compose -f compose.yml up -d
 
             - name: Wait for services to be ready
-                run: sleep 60
+              run: sleep 60
 
             - name: Test Jellyfin
-                run: curl -f http://localhost:8096 || exit 1
+              run: curl -f http://localhost:8096 || exit 1
 
             - name: Test Radarr
-                run: curl -f http://localhost:7878 || exit 1
+              run: curl -f http://localhost:7878 || exit 1
 
             - name: Test Sonarr
-                run: curl -f http://localhost:8989 || exit 1
+              run: curl -f http://localhost:8989 || exit 1
 
             - name: Test Readarr
-                run: curl -f http://localhost:8787 || exit 1
+              run: curl -f http://localhost:8787 || exit 1
 
             - name: Test Lidarr
-                run: curl -f http://localhost:8686 || exit 1
+              run: curl -f http://localhost:8686 || exit 1
 
             - name: Test Prowlarr
-                run: curl -f http://localhost:9696 || exit 1
+              run: curl -f http://localhost:9696 || exit 1
 
             - name: Test Flaresolverr
-                run: curl -f http://localhost:8191 || exit 1
+              run: curl -f http://localhost:8191 || exit 1
 
             - name: Test Dozzle
-                run: curl -f http://localhost:9999 || exit 1
+              run: curl -f http://localhost:9999 || exit 1
 
             - name: Tear down Docker Compose
-                run: docker-compose -f compose.yml down
+              run: docker-compose -f compose.yml down
