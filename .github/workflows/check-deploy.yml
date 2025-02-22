@@ -1,0 +1,92 @@
+name: Test Deployment
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    test-deployment:
+        runs-on: ubuntu-latest
+
+        services:
+            docker:
+                image: docker:19.03.12
+                options: --privileged
+                ports:
+                    - 8096:8096
+                    - 8920:8920
+                    - 7878:7878
+                    - 8989:8989
+                    - 8787:8787
+                    - 8686:8686
+                    - 9696:9696
+                    - 8191:8191
+                    - 9999:8080
+
+        steps:
+            - name: Checkout code
+                uses: actions/checkout@v2
+
+            - name: Set up Docker Buildx
+                uses: docker/setup-buildx-action@v1
+
+            - name: Cache Docker layers
+                uses: actions/cache@v2
+                with:
+                    path: /tmp/.buildx-cache
+                    key: ${{ runner.os }}-buildx-${{ github.sha }}
+                    restore-keys: |
+                        ${{ runner.os }}-buildx-
+
+            - name: Set up QEMU
+                uses: docker/setup-qemu-action@v1
+
+            - name: Login to DockerHub
+                uses: docker/login-action@v1
+                with:
+                    username: ${{ secrets.DOCKER_USERNAME }}
+                    password: ${{ secrets.DOCKER_PASSWORD }}
+
+            - name: Build and push
+                uses: docker/build-push-action@v2
+                with:
+                    context: .
+                    push: false
+                    tags: user/app:latest
+
+            - name: Run Docker Compose
+                run: docker-compose -f compose.yml up -d
+
+            - name: Wait for services to be ready
+                run: sleep 60
+
+            - name: Test Jellyfin
+                run: curl -f http://localhost:8096 || exit 1
+
+            - name: Test Radarr
+                run: curl -f http://localhost:7878 || exit 1
+
+            - name: Test Sonarr
+                run: curl -f http://localhost:8989 || exit 1
+
+            - name: Test Readarr
+                run: curl -f http://localhost:8787 || exit 1
+
+            - name: Test Lidarr
+                run: curl -f http://localhost:8686 || exit 1
+
+            - name: Test Prowlarr
+                run: curl -f http://localhost:9696 || exit 1
+
+            - name: Test Flaresolverr
+                run: curl -f http://localhost:8191 || exit 1
+
+            - name: Test Dozzle
+                run: curl -f http://localhost:9999 || exit 1
+
+            - name: Tear down Docker Compose
+                run: docker-compose -f compose.yml down
