@@ -1,0 +1,185 @@
+version: "3.0"
+
+networks:
+  proxy:
+    driver: bridge
+  jellyfin_default:
+    driver: bridge
+  starr:
+    driver: bridge
+
+volumes:
+  nas_media:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${MEDIA_PATH}
+      o: bind
+
+services:
+  #Jellyfin - used to display the media
+  jellyfin:
+    image: ghcr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - JELLYFIN_PublishedServerUrl=${JELLYFIN_URL}
+      - PUID=${PUID}
+      - PGID=${PGID}
+    ports:
+      - 8096:8096
+      - 8920:8920
+#    devices:
+#      - /dev/dri:/dev/dri #Required for jellyfin HW transcoding / QuickSync
+    volumes:
+      - ${BASE_PATH}/jellyfin:/config
+      - nas_media:/media
+    restart: unless-stopped
+    networks:
+      - proxy
+      - starr
+
+  # Cloudflared - Used for secure tunneling
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN} # Remplace par ton token
+    restart: unless-stopped
+    networks:
+      - proxy
+    command: tunnel --no-autoupdate run
+    volumes:
+      - ${BASE_PATH}/cloudflared:/etc/cloudflared
+
+  #Radarr - used to find movies automatically
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${BASE_PATH}/radarr/config:/config
+      - nas_media:/data/media
+    ports:
+      - 7878:7878
+    networks:
+      - proxy
+      - starr
+    restart: unless-stopped
+
+  #Sonarr - used to find shows automatically
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${BASE_PATH}/sonarr/config:/config
+      - nas_media:/data/media
+    ports:
+      - 8989:8989
+    networks:
+      - proxy
+      - starr
+    restart: unless-stopped
+
+  #Readarr - used to download books
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${BASE_PATH}/readarr/config:/config
+      - nas_media:/data/media
+    ports:
+      - 8787:8787
+    networks:
+      - proxy
+      - starr
+    restart: unless-stopped
+
+  #Lidarr - used to download music
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${BASE_PATH}/lidarr/config:/config
+      - nas_media:/data/media
+    ports:
+      - 8686:8686
+    networks:
+      - proxy
+      - starr
+    restart: unless-stopped
+
+  #Prowlarr - manages your Sonarr, Radarr and download client
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${BASE_PATH}/prowlarr/config:/config
+    ports:
+      - 9696:9696
+    networks:
+      - proxy
+      - starr
+    restart: unless-stopped
+
+  #Flaresolverr - Used as a proxy server to bypass Cloudflare and DDoS-GUARD protection
+  flaresolverr:
+    image: flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=${TZ}
+      - LANG=en_GB
+      - DRIVER=nodriver
+    networks:
+      - starr
+    ports:
+      - 8191:8191/tcp # flaresolverr
+    restart: unless-stopped
+
+  #Dozzle - Used to easily view logs of any container in real time
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 9999:8080
+
+  #Unpacker - Used to unzip zipped files
+  unpackerr:
+    image: golift/unpackerr:latest
+    container_name: unpackerr
+    volumes:
+      - nas_media:/data/media
+    restart: always
+    user: 1000:1000
+    environment:
+      - UN_START_DELAY=1m
+      - TZ=${TZ}
+      - UN_SONARR_0_URL=http://sonarr:8989
+      - UN_SONARR_0_API_KEY=${SONARR_KEY}
+      - UN_RADARR_0_URL=http://radarr:7878
+      - UN_RADARR_0_API_KEY=${RADARR_KEY}
+    networks:
+      - starr
