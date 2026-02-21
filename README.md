@@ -22,6 +22,9 @@ My custom torrenting and seeding installation for media server (jellyfin)
 - Flaresolverr: Proxy server to bypass Cloudflare and DDoS-GUARD protection
 - Dozzle: View logs of any container in real time
 - Unpacker: Unzip zipped files
+- qBittorrent: Torrent client
+- Gluetun (Optional): VPN client for secure torrenting
+- Requestrr (Optional): Discord bot for requesting media
 
 ## Configuration
 Rename `.env.example` to `.env` and fill in the following values:
@@ -44,7 +47,48 @@ RADARR_KEY=your_radarr_api_key_here
 # Media path
 MEDIA_PATH=/path/to/your/media
 BASE_PATH=/path/to/your/base
+
+# Enabled profiles (comma-separated). 
+# Options: 
+# - novpn (default qbittorrent without VPN)
+# - vpn (qbittorrent routed through gluetun VPN)
+# - discord (requestrr discord bot)
+COMPOSE_PROFILES=novpn
+
+# Gluetun VPN environment variables (Optional)
+# See https://github.com/qdm12/gluetun-wiki/tree/main/setup/providers for full list of providers
+# Common providers: nordvpn, protonvpn, mullvad, expressvpn, surfshark, cyberghost, pia, custom
+
+VPN_SERVICE_PROVIDER=nordvpn
+VPN_TYPE=openvpn # or wireguard
+
+# --- OpenVPN Configuration (NordVPN, ExpressVPN, ProtonVPN, etc.) ---
+OPENVPN_USER=your_openvpn_username
+OPENVPN_PASSWORD=your_openvpn_password
+
+# --- Wireguard Configuration (Mullvad, Custom, etc.) ---
+WIREGUARD_PRIVATE_KEY=your_wireguard_private_key_here
+WIREGUARD_ADDRESSES=your_wireguard_addresses_here
+
+# --- Server Selection (Optional) ---
+# SERVER_COUNTRIES=Switzerland
+# SERVER_REGIONS=Europe
+# SERVER_CITIES=Zurich
 ```
+
+### Enabling Optional Services
+This stack uses Docker Compose profiles to manage optional services. You can enable them by modifying the `COMPOSE_PROFILES` variable in your `.env` file.
+
+**Gluetun (VPN) & qBittorrent Integration:**
+1. Change `COMPOSE_PROFILES=novpn` to `COMPOSE_PROFILES=vpn` in your `.env` file.
+2. Fill in the VPN variables in your `.env` file based on your provider (e.g., NordVPN, ProtonVPN, Mullvad, ExpressVPN). You can find the exact variables needed for your provider in the [Gluetun Wiki](https://github.com/qdm12/gluetun-wiki/tree/main/setup/providers).
+3. Run `docker-compose up -d` to apply the changes.
+*(Note: When using the VPN profile, qBittorrent's traffic is automatically routed through Gluetun, and other services will communicate with it seamlessly).*
+
+**Requestrr (Discord Bot):**
+1. Add `discord` to your `COMPOSE_PROFILES` (e.g., `COMPOSE_PROFILES=novpn,discord` or `COMPOSE_PROFILES=vpn,discord`).
+2. Run `docker-compose up -d` to apply the changes.
+3. Configure the bot via its web interface at `http://localhost:4545`.
 
 ## FAQ
 **Q: How do I access the Jellyfin server?**
