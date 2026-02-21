@@ -87,23 +87,6 @@ services:
       - starr
     restart: unless-stopped
 
-  #Readarr - used to download books
-  readarr:
-    image: lscr.io/linuxserver/readarr:develop
-    container_name: readarr
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${BASE_PATH}/readarr/config:/config
-      - nas_media:/data/media
-    ports:
-      - 8787:8787
-    networks:
-      - proxy
-      - starr
-    restart: unless-stopped
 
   #Lidarr - used to download music
   lidarr:

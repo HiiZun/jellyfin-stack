@@ -35,7 +35,7 @@ jobs:
               uses: docker/setup-buildx-action@v1
 
             - name: Cache Docker layers
-              uses: actions/cache@v2
+              uses: actions/cache@v4
               with:
                     path: /tmp/.buildx-cache
                     key: ${{ runner.os }}-buildx-${{ github.sha }}
@@ -65,9 +65,6 @@ jobs:
 
             - name: Test Sonarr
               run: curl -f http://localhost:8989 || exit 1
-
-            - name: Test Readarr
-              run: curl -f http://localhost:8787 || exit 1
 
             - name: Test Lidarr
               run: curl -f http://localhost:8686 || exit 1

@@ -16,7 +16,6 @@ My custom torrenting and seeding installation for media server (jellyfin)
 - Cloudflared: Secure tunneling to your domain
 - Radarr: Automatically find movies
 - Sonarr: Automatically find TV shows
-- Readarr: Download books
 - Lidarr: Download music
 - Prowlarr: Manage Sonarr, Radarr, and download clients
 - Flaresolverr: Proxy server to bypass Cloudflare and DDoS-GUARD protection
