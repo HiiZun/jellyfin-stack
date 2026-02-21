@@ -207,6 +207,7 @@ services:
       - SERVER_COUNTRIES=${SERVER_COUNTRIES:-}
       - SERVER_REGIONS=${SERVER_REGIONS:-}
       - SERVER_CITIES=${SERVER_CITIES:-}
+      - SERVER_CATEGORIES=${SERVER_CATEGORIES:-}
     ports:
       - 8080:8080 # qbittorrent webui
       - 6881:6881 # qbittorrent torrent port

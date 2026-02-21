@@ -74,6 +74,7 @@ WIREGUARD_ADDRESSES=your_wireguard_addresses_here
 # SERVER_COUNTRIES=Switzerland
 # SERVER_REGIONS=Europe
 # SERVER_CITIES=Zurich
+# SERVER_CATEGORIES=legacy_p2p
 ```
 
 ### Enabling Optional Services
