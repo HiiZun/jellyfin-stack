@@ -40,7 +40,7 @@ services:
 
   # Cloudflared - Used for secure tunneling
   cloudflared:
-    image: cloudflare/cloudflared:latest
+    image: docker.io/cloudflare/cloudflared:latest
     container_name: cloudflared
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN} # Remplace par ton token
@@ -142,7 +142,7 @@ services:
 
   #Flaresolverr - Used as a proxy server to bypass Cloudflare and DDoS-GUARD protection
   flaresolverr:
-    image: flaresolverr/flaresolverr:latest
+    image: docker.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     environment:
       - LOG_LEVEL=info
@@ -160,7 +160,7 @@ services:
   #Dozzle - Used to easily view logs of any container in real time
   dozzle:
     container_name: dozzle
-    image: amir20/dozzle:latest
+    image: docker.io/amir20/dozzle:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
@@ -168,7 +168,7 @@ services:
 
   #Unpacker - Used to unzip zipped files
   unpackerr:
-    image: golift/unpackerr:latest
+    image: docker.io/golift/unpackerr:latest
     container_name: unpackerr
     volumes:
       - nas_media:/data/media
@@ -186,7 +186,7 @@ services:
 
   # Gluetun - VPN client (Optional)
   gluetun:
-    image: qmcgaw/gluetun
+    image: docker.io/qmcgaw/gluetun:latest
     container_name: gluetun
     profiles:
       - vpn
@@ -263,7 +263,7 @@ services:
 
   # Requestrr - Discord bot for requesting media (Optional)
   requestrr:
-    image: darkalfx/requestrr:latest
+    image: docker.io/darkalfx/requestrr:latest
     container_name: requestrr
     profiles:
       - discord
