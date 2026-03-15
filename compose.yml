@@ -198,7 +198,7 @@ services:
       - SERVER_CITIES=${SERVER_CITIES:-}
       - SERVER_CATEGORIES=${SERVER_CATEGORIES:-}
     ports:
-      - 8080:8080 # qbittorrent webui
+      - ${QBITTORRENT_WEBUI_PORT:-8080}:${QBITTORRENT_WEBUI_PORT:-8080} # qbittorrent webui
       - 6881:6881 # qbittorrent torrent port
       - 6881:6881/udp
     volumes:
@@ -220,13 +220,15 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - WEBUI_PORT=8080
+      - WEBUI_PORT=${QBITTORRENT_WEBUI_PORT:-8080}
+      - QBITTORRENT_WEBUI_PASSWORD=${QBITTORRENT_WEBUI_PASSWORD:-}
     volumes:
       - ${BASE_PATH}/qbittorrent/config:/config
       - nas_media:/data/media
+      - ./docker/qbittorrent/custom-cont-init.d:/custom-cont-init.d:ro
     restart: unless-stopped
     ports:
-      - 8080:8080
+      - ${QBITTORRENT_WEBUI_PORT:-8080}:${QBITTORRENT_WEBUI_PORT:-8080}
       - 6881:6881
       - 6881:6881/udp
     networks:
@@ -244,10 +246,12 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - WEBUI_PORT=8080
+      - WEBUI_PORT=${QBITTORRENT_WEBUI_PORT:-8080}
+      - QBITTORRENT_WEBUI_PASSWORD=${QBITTORRENT_WEBUI_PASSWORD:-}
     volumes:
       - ${BASE_PATH}/qbittorrent/config:/config
       - nas_media:/data/media
+      - ./docker/qbittorrent/custom-cont-init.d:/custom-cont-init.d:ro
     restart: unless-stopped
 
   # Requestrr - Discord bot for requesting media (Optional)

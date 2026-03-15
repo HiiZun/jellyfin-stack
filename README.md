@@ -39,6 +39,11 @@ CLOUDFLARED_TUNNEL_TOKEN=your_tunnel_token_here
 # Common environment variables
 TZ=Europe/Paris
 
+# qBittorrent WebUI
+QBITTORRENT_WEBUI_PORT=8080
+# Leave empty to keep qBittorrent's generated temporary admin password.
+QBITTORRENT_WEBUI_PASSWORD=
+
 # Unpacker environment variables
 SONARR_KEY=your_sonarr_api_key_here
 RADARR_KEY=your_radarr_api_key_here
@@ -84,6 +89,13 @@ This stack uses Docker Compose profiles to manage optional services. You can ena
 2. Fill in the VPN variables in your `.env` file based on your provider (e.g., NordVPN, ProtonVPN, Mullvad, ExpressVPN). You can find the exact variables needed for your provider in the [Gluetun Wiki](https://github.com/qdm12/gluetun-wiki/tree/main/setup/providers).
 3. Run `docker-compose up -d` to apply the changes.
 *(Note: When using the VPN profile, qBittorrent's traffic is automatically routed through Gluetun, and other services will communicate with it seamlessly).*
+
+### qBittorrent WebUI
+- Access the WebUI at `http://localhost:<QBITTORRENT_WEBUI_PORT>` (default `http://localhost:8080`).
+- The default username remains `admin`.
+- Set `QBITTORRENT_WEBUI_PASSWORD` in `.env` to define the WebUI password used on container startup.
+- Leave `QBITTORRENT_WEBUI_PASSWORD` empty if you want qBittorrent to keep generating a temporary admin password in the container logs.
+- If you change the password in the WebUI itself, the value from `.env` will be applied again on the next container restart.
 
 **Requestrr (Discord Bot):**
 1. Add `discord` to your `COMPOSE_PROFILES` (e.g., `COMPOSE_PROFILES=novpn,discord` or `COMPOSE_PROFILES=vpn,discord`).
