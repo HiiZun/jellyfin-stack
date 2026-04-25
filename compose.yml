@@ -26,11 +26,11 @@ services:
     ports:
       - ${JELLYFIN_HTTP_PORT:-8096}:8096
       - ${JELLYFIN_HTTPS_PORT:-8920}:8920
-#    devices:
-#      - /dev/dri:/dev/dri #Required for jellyfin HW transcoding / QuickSync
+    #    devices:
+    #      - /dev/dri:/dev/dri #Required for jellyfin HW transcoding / QuickSync
     volumes:
       - ${BASE_PATH}/jellyfin:/config
-      - nas_media:/media
+      - nas_media:/data/media
     restart: unless-stopped
     networks:
       - proxy
@@ -88,7 +88,6 @@ services:
       - proxy
       - starr
     restart: unless-stopped
-
 
   #Lidarr - used to download music
   lidarr:
