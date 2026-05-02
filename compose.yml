@@ -183,6 +183,7 @@ services:
       - 1.0.0.1
     environment:
       - GLUETUN_DNS=1.1.1.1,1.0.0.1
+      - FIREWALL_INPUT_PORTS=${QBITTORRENT_WEBUI_PORT:-8080}
       - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
       - VPN_TYPE=${VPN_TYPE}
       # OpenVPN variables
@@ -208,6 +209,7 @@ services:
       starr:
         aliases:
           - qbittorrent
+          - qbittorrent-vpn
 
   # qBittorrent - Torrent client (No VPN)
   qbittorrent:
